@@ -58,6 +58,7 @@ Content.AddCharacterDef
 	{
 		base_def = "NPC_BASE",
 		faction_id = "JAKES",
+		desc = "Ghost",
 		name = "Ghost",
         shorttitle = "Jakes Ghost",
 		combat_strength = 4,
@@ -82,6 +83,10 @@ Content.AddCharacterDef
     	loved_graft = "sharpened_blades",
     	hated_graft = "hemophiliac",
 
+		aspects = {
+			social_connections = true,
+		},
+
 		social_boons =
 		{
 			[ RELATIONSHIP.LIKED ] = { ASSASSINATE = 1, NOTHING = 3 },
@@ -92,6 +97,9 @@ Content.AddCharacterDef
         build = "male_phicket",
 		anims = {"anim/weapon_sword_phicket_assassin.zip"},
 		combat_anims = { "anim/med_combat_sword_phicket_assassin.zip" },
+
+		skin_colour = 0xFFFFFFFF,
+		hair_colour = 0xFFFFFFFF,
 
 
 		fight_data = 
