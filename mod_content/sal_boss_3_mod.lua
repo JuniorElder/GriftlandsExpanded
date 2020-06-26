@@ -31,7 +31,7 @@ local def = CharacterDef("DRUSK_ANCIENT",
     fight_data = 
     {
             MAX_MORALE = MAX_MORALE_LOOKUP.IMMUNE,
-            MAX_HEALTH = 200,
+            MAX_HEALTH = {200, 220, 240},
             battle_scale = 1.25,
             status_widget_dx = 0.5,
             status_widget_dy = -0.95,
@@ -99,7 +99,7 @@ local def = CharacterDef("DRUSK_ANCIENT",
                 anim = "stab",
                 flags = CARD_FLAGS.MELEE,
 
-                base_damage = 8,
+                base_damage = {8,10,12},
                 defensiveness_amount = 2	,
 
                 OnPostResolve = function( self, battle, attack )
@@ -114,11 +114,11 @@ local def = CharacterDef("DRUSK_ANCIENT",
                 anim = "taunt_defend",
                 flags = CARD_FLAGS.BUFF | CARD_FLAGS.SKILL,
                 target_type = TARGET_TYPE.SELF,
-                defend_amount = 6,
+                defend_amount = {6,8,10},
                 power_amount = 2,
 
                 OnPostResolve = function( self, battle, attack )
-                    self.owner:AddCondition("DEFEND", self.defend_amount, self)
+                    self.owner:AddCondition("DEFEND", self.defend_amount[GetAdvancementModifier( ADVANCEMENT_OPTION.NPC_BOSS_DIFFICULTY ) or 1], self)
                     self.owner:AddCondition("POWER", self.power_amount, self)
                 end
             },
@@ -129,11 +129,11 @@ local def = CharacterDef("DRUSK_ANCIENT",
                 anim = "stab",
                 flags = CARD_FLAGS.BUFF | CARD_FLAGS.MELEE,
 
-                base_damage = 8,
-                defend_amount = 6,
+                base_damage = {8,10,12},
+                defend_amount = {6,8,10},
 
                 OnPostResolve = function( self, battle, attack )
-                    self.owner:AddCondition("DEFEND", self.defend_amount, self)
+                    self.owner:AddCondition("DEFEND", self.defend_amount[GetAdvancementModifier( ADVANCEMENT_OPTION.NPC_BOSS_DIFFICULTY ) or 1], self)
                 end
             },
 
@@ -144,7 +144,7 @@ local def = CharacterDef("DRUSK_ANCIENT",
                 anim = "stab",
                 flags = CARD_FLAGS.MELEE,
 
-                base_damage = 6,
+                base_damage = {6,8,10},
    		        hit_count = 2,
 
             },
@@ -156,7 +156,7 @@ local def = CharacterDef("DRUSK_ANCIENT",
 
                 flags = CARD_FLAGS.RANGED,
                 target_mod = TARGET_MOD.TEAM,
-                base_damage = 8,
+                base_damage = {8,10,12},
 
                 features =
                 {
@@ -171,14 +171,14 @@ local def = CharacterDef("DRUSK_ANCIENT",
                 anim = "stab",
                 flags = CARD_FLAGS.BUFF | CARD_FLAGS.MELEE,
 
-                base_damage = 6,
-                defend_amount = 6,
+                base_damage = {6,8,10},
+                defend_amount = {6,8,10},
                 power_amount = 1,
                 defensiveness_amount = 1,
 
                 OnPostResolve = function( self, battle, attack )
-                    self.owner:AddCondition("DEFEND", self.defend_amount, self)
-                    self.owner:AddCondition("POWER", self.power_amount, self)
+                    self.owner:AddCondition("DEFEND", self.defend_amount[GetAdvancementModifier( ADVANCEMENT_OPTION.NPC_BOSS_DIFFICULTY ) or 1], self)
+                    self.owner:AddCondition("POWER", self.power_amount[GetAdvancementModifier( ADVANCEMENT_OPTION.NPC_BOSS_DIFFICULTY ) or 1], self)
                     self.owner:AddCondition("SURE_FOOTING", self.defensiveness_amount, self)
                 end
             },

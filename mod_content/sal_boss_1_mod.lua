@@ -92,7 +92,7 @@ Content.AddCharacterDef
 					hit_tags = { "spark" },
 
 					flags = battle_defs.CARD_FLAGS.RANGED,
-					base_damage = 5,
+					base_damage = { 6, 7, 8 },
 					charge_amount = 1,
 					
 					OnPostResolve = function( self, battle, attack )
@@ -110,7 +110,7 @@ Content.AddCharacterDef
 					hit_tags = { "spark" },
 
 					flags = battle_defs.CARD_FLAGS.RANGED | battle_defs.CARD_FLAGS.SPECIAL,
-					base_damage = 14,
+					base_damage = { 14, 18, 22 },
 					hit_count = 1,
 					charge_amount = 2,
 
@@ -128,7 +128,7 @@ Content.AddCharacterDef
 
 					flags = battle_defs.CARD_FLAGS.RANGED,
 
-					base_damage = 5,
+					base_damage = { 5, 7, 9 },
 					hit_count = 2,
 					charge_amount = 1,
 
@@ -146,12 +146,14 @@ Content.AddCharacterDef
 			        pre_anim = "idle_ground_post",
 			        post_anim = "idle_ground_pre",
 
-					defend_amount = 6,
+					defend_amount = {6,8,10},
 					charge_amount = 2,
 
 					OnPostResolve = function( self, battle, attack )
+                        local defend_amount = self.defend_amount[ GetAdvancementModifier( ADVANCEMENT_OPTION.NPC_BOSS_DIFFICULTY ) or 1 ]
+
 						self.owner:AddCondition("CHARGES", self.charge_amount, self)
-						self.owner:AddCondition("DEFEND", self.defend_amount, self)
+                        self.owner:AddCondition("DEFEND", math.floor(defend_amount))
 					end,
 
 				}

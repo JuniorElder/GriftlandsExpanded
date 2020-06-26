@@ -75,7 +75,7 @@ local attacks =
     {
         name = "Bleachbug Tincture",
         icon = "negotiation/liquid_courage.tex",
-        desc = "Gain 3 {EVASION} but lose 6 health.",
+        desc = "Gain 4 {EVASION} but lose 8 health.",
         anim = "taunt",
     	cost = 1,
 

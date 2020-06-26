@@ -175,7 +175,7 @@ Content.AddCharacterDef
 			        anim = "bloodbind",
 			        flags = CARD_FLAGS.MELEE,
 
-			        base_damage = 7,
+			        base_damage = { 7, 8, 9 },
 
 					hit_count = 2,
 				
@@ -198,7 +198,7 @@ Content.AddCharacterDef
 			        anim = "attack3",
 			        flags = CARD_FLAGS.MELEE ,
 
-			        base_damage = 4,
+			        base_damage = { 4, 4, 5 },
 
 					hit_count = 3,
 					
@@ -219,7 +219,7 @@ Content.AddCharacterDef
 			        anim = "slash",
 			        flags = CARD_FLAGS.MELEE,
 			        
-					base_damage = 12,
+					base_damage = { 12, 14, 16 },
 					
 					defend = 6,
 					wound = 3,
@@ -250,7 +250,7 @@ Content.AddCharacterDef
 			        target_type = TARGET_TYPE.SELF,
 
 					
-			        sure_footing = 2,
+			        sure_footing = {2,3,3},
 					defend = 8,
 					combo_defend = 6,
 
@@ -260,7 +260,7 @@ Content.AddCharacterDef
 						end
 						self.owner:AddCondition("COMBO", self.combo )
 			            self.owner:AddCondition("DEFEND", self.defend )
-			            self.owner:AddCondition("SURE_FOOTING", self.sure_footing )
+			            self.owner:AddCondition("SURE_FOOTING", self.sure_footing[GetAdvancementModifier( ADVANCEMENT_OPTION.NPC_BOSS_DIFFICULTY ) or 1])
 			        end
 			    },
 			},
