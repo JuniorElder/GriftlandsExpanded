@@ -1,10 +1,12 @@
 # GriftlandsExpanded
 
-Mod for Griftlands that expands the game by adding new cards and bosses. In the future, I would like to add some new enemies and grafts as well. Currently, all the content you get is for Sal only.
+Mod for Griftlands that expands the game by adding new cards and bosses. In the future, I would like to add some new enemies and grafts as well.
 
 ## Currently Added
 
 8 battle and 4 negotiation cards for Sal
+
+8 battle and 4 negotiation cards for Rook
 
 3 new bosses for Sal's story
 
@@ -28,7 +30,7 @@ If it doesn't work, put the "mods" folder directly into "[user]/AppData/Roaming/
 
 Intended and tested for the main game version. Use it with the experimental branch at your own risk.
 
-I can't guarantee compatibility with other mods, but it can probably be used along with other mods that add cards to the game.
+I can't guarantee complete compatibility with other mods, but it can probably be used along with other mods.
 
 ## Feedback and Troubleshooting
 
@@ -48,10 +50,6 @@ All the art, animations, and sounds are taken from the game and belong to Klei.
 
 ## What's next?
 
-Adding current bosses to Brawl
-
-Applying prestige effects to bosses
+Bosses for Rook's story
 
 Alternative fight with Oolo and Nadan?
-
-Stuff for Rook will come after that's done
