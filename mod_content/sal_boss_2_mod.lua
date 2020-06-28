@@ -123,7 +123,7 @@ Content.AddCharacterDef
 				combo_factor = 
 				{
 					name = "Combo Potential",
-					desc = "Gains bonuses with higher {COMBO}.\n{COMBO} => 5: at the end of turn gain 6 base {DEFEND}\n{COMBO} => 10: all attacks apply 1 {WOUND}\n{COMBO} => 15: all attacks apply 1 {CRIPPLE}",
+					desc = "Gains bonuses with higher {COMBO}.\n{COMBO} => 5: at the end of turn gain 6 base {DEFEND}\n{COMBO} => 10: all attacks apply 1 {WOUND}\n{COMBO} => 15: all attacks apply 1 {IMPAIR}",
 					icon = "battle/conditions/inside_fighting.tex",
 				},
 
@@ -160,7 +160,7 @@ Content.AddCharacterDef
                     {
                         [ BATTLE_EVENT.ON_HIT] = function( self, battle, attack, hit )
                             if attack.attacker == self.owner and attack.card and attack.card:IsAttackCard() and self.owner:GetConditionStacks( "COMBO" ) >= 15 and not hit.defended and not hit.evaded then
-                                hit.target:AddCondition("CRIPPLE", self.stacks, self)
+                                hit.target:AddCondition("IMPAIR", self.stacks, self)
                             end
                         end,
                     },
