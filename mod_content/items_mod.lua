@@ -124,8 +124,30 @@ local attacks =
 
     },
 
-}
+lumin_burner =
+{
+    name = "Lumin Burner",
+    icon = "battle/skimmer.tex",
+    anim = "taunt",
+    desc = "Gain {1} {SURGE}.",
+    desc_fn = function( self, fmt_str )
+        return loc.format(fmt_str, self.surge_amt)
+    end,
 
+    cost = 1,
+
+    rarity = CARD_RARITY.UNIQUE,
+    flags = CARD_FLAGS.SKILL | CARD_FLAGS.EXPEND | CARD_FLAGS.AMBUSH,
+    target_type = TARGET_TYPE.SELF,
+
+    surge_amt = 6,
+
+    OnPostResolve = function( self, battle, attack )
+        self.owner:AddCondition("SURGE", self.surge_amt, self)
+    end
+},
+
+}
 
 for i, id, data in sorted_pairs(attacks) do
     data.series = "GENERAL"
