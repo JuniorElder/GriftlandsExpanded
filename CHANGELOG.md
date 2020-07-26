@@ -1,5 +1,17 @@
 # CHANGELOG
 
+## Verison 0.3
+
+12 new negotiation cards for Sal
+
+4 new negotiation cards for Sal
+
+Slight changes to older Sal's cards
+
+Quick Reflexes removed completely
+
+Fixed Drusk Ancient crashing the game
+
 ## Verison 0.21
 
 Day 1 boss for Rook added
