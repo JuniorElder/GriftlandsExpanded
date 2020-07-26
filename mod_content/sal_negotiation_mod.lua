@@ -187,7 +187,7 @@ local CARDS =
             end
         end,
         flags = CARD_FLAGS.DIPLOMACY | CARD_FLAGS.UNPLAYABLE,
-        rarity = CARD_RARITY.UNCOMMON,
+        rarity = CARD_RARITY.COMMON,
         auto_target = true,
         target_mod = TARGET_MOD.RANDOM1,
 
@@ -234,6 +234,195 @@ local CARDS =
         evoke_max = 3,
     },
 
+    humiliation = 
+    {
+        name = "Humiliation",
+        icon = "negotiation/reckless_insults.tex",
+        desc = "If this card destroys an argument, incept {DOUBT 1}.",
+
+        flags = CARD_FLAGS.HOSTILE,
+        rarity = CARD_RARITY.COMMON,
+
+        cost = 1,
+        min_persuasion = 2,
+        max_persuasion = 4,
+
+        event_handlers =
+        {
+            [ EVENT.MODIFIER_REMOVED ] = function( self, modifier, card )
+                if card == self then
+                    self.anti_negotiator:InceptModifier( "DOUBT", 1, self )
+                end
+            end,
+        },
+    },
+    
+    humiliation_plus =
+    {
+        name = "Twisted Humiliation",
+        desc = "If this card destroys an argument, incept {DOUBT 2}.",
+        min_persuasion = 1,
+        max_persuasion = 3,
+
+        event_handlers =
+        {
+            [ EVENT.MODIFIER_REMOVED ] = function( self, modifier, card )
+                if card == self then
+                    self.anti_negotiator:InceptModifier( "DOUBT", 2, self )
+                end
+            end,
+        },
+    },
+
+    humiliation_plus2 =
+    {
+        name = "Tall Humiliation",
+        desc = "If this card destroys an argument, incept {DOUBT 1}.\nCannot target core arguments.",
+        min_persuasion = 2,
+        max_persuasion = 8,
+
+        CanTarget = function ( self, target )
+            if is_instance( target, Negotiation.Modifier ) and target.modifier_type == MODIFIER_TYPE.CORE then
+                return false, CARD_PLAY_REASONS.INVALID_TARGET
+            end
+            return true
+        end,
+    },
+
+    set_expectations =
+    {
+        name = "Set Expectations",
+        icon = "negotiation/pressure.tex",
+        desc = "Deals 1 more max damage per {DOUBT} stack of your opponent.",
+
+        max_xp = 6,
+        cost = 1,
+
+        min_persuasion = 1,
+        max_persuasion = 3,
+
+        flags = CARD_FLAGS.DIPLOMACY,
+        rarity = CARD_RARITY.UNCOMMON,
+
+        event_priorities =
+        {
+            [ EVENT.CALC_PERSUASION ] = EVENT_PRIORITY_ADDITIVE,
+        },
+
+        event_handlers = 
+        {
+            [ EVENT.CALC_PERSUASION ] = function( self, source, persuasion )
+                if source == self then
+                    local bonus = 0
+                    bonus = self.anti_negotiator:GetModifierStacks("DOUBT")
+                    persuasion:AddPersuasion( 0, bonus, self )
+                end
+            end,
+        },
+    },
+    set_expectations_plus =
+    {
+        name = "Boosted Set Expectations",
+        min_persuasion = 2,
+        max_persuasion = 4,
+    },
+
+    set_expectations_plus2 =
+    {
+        name = "Mirrored Set Expectations",
+        desc = "Attack twice. Deals 1 more max damage per {DOUBT} stack of your opponent.",
+
+        min_persuasion = 0,
+        max_persuasion = 1,
+
+        OnPostResolve = function( self, minigame )
+            minigame:ApplyPersuasion( self )
+        end,
+    },
+
+    paranoia =
+    {
+        name = "Paranoia",
+        icon = "negotiation/go_between.tex",
+        desc = "Remove all {DOUBT} of your opponent. Gain 1 action and draw 1 card for every 2 stacks removed.",
+
+        flags = CARD_FLAGS.MANIPULATE | CARD_FLAGS.EXPEND,
+        rarity = CARD_RARITY.RARE,
+        cost = 1,
+
+        mod_xp = -2,
+
+        doubt_cost = 2,
+
+        PreReq = function( self, minigame )
+            return self.anti_negotiator:GetModifierStacks("DOUBT") >= self.doubt_cost
+        end,
+
+        OnPostResolve = function( self, minigame )
+            local gain = 0
+            gain = math.floor( self.anti_negotiator:GetModifierStacks("DOUBT") / self.doubt_cost )
+            minigame:DrawCards(gain)
+            minigame:ModifyActionCount( gain, self )
+            self.anti_negotiator:RemoveModifier("DOUBT", self.anti_negotiator:GetModifierStacks("DOUBT"), self )
+        end,
+    },
+    paranoia_plus =
+    {
+        name = "Pale Paranoia",
+        cost = 0,
+    },
+
+    paranoia_plus2 =
+    {
+        name = "Boosted Paranoia",
+        desc = "Remove all {DOUBT} of your opponent. Gain 2 action and draw 2 card for every 3 stacks removed.",
+        cost = 2,
+        doubt_cost = 3,
+
+        OnPostResolve = function( self, minigame )
+            local gain = 0
+            gain = math.floor( self.anti_negotiator:GetModifierStacks("DOUBT") / self.doubt_cost )
+            minigame:DrawCards(gain*2)
+            minigame:ModifyActionCount( gain*2, self )
+            self.anti_negotiator:RemoveModifier("DOUBT", self.anti_negotiator:GetModifierStacks("DOUBT"), self )
+        end,
+    },
+
+    protection_money =
+    {
+        name = "Protection Money",
+        icon = "negotiation/rant.tex",
+        desc = "Remove all {DOUBT} of your opponent. Gain 5 Shils for every stack removed.",
+
+        flags = CARD_FLAGS.HOSTILE,
+        rarity = CARD_RARITY.UNCOMMON,
+        cost = 1,
+
+        max_xp = 5,
+
+        min_persuasion = 2,
+        max_persuasion = 4,
+
+        OnPostResolve = function( self, minigame )
+            local gain = 0
+            gain = self.anti_negotiator:GetModifierStacks("DOUBT")
+            minigame:ModifyMoney( 5 * gain )
+            self.anti_negotiator:RemoveModifier("DOUBT", self.anti_negotiator:GetModifierStacks("DOUBT"), self )
+        end,
+    },
+    protection_money_plus =
+    {
+        name = "Pale Protection Money",
+        flags = CARD_FLAGS.HOSTILE | CARD_FLAGS.EXPEND,
+        cost = 0,
+    },
+
+    protection_money_plus2 =
+    {
+        name = "Tall Protection Money",
+        min_persuasion = 2,
+        max_persuasion = 6,
+    },
 }
 
 for i, id, carddef in sorted_pairs( CARDS ) do

@@ -178,7 +178,7 @@ local def = CharacterDef("DRUSK_ANCIENT",
 
                 OnPostResolve = function( self, battle, attack )
                     self.owner:AddCondition("DEFEND", self.defend_amount[GetAdvancementModifier( ADVANCEMENT_OPTION.NPC_BOSS_DIFFICULTY ) or 1], self)
-                    self.owner:AddCondition("POWER", self.power_amount[GetAdvancementModifier( ADVANCEMENT_OPTION.NPC_BOSS_DIFFICULTY ) or 1], self)
+                    self.owner:AddCondition("POWER", self.power_amount, self)
                     self.owner:AddCondition("SURE_FOOTING", self.defensiveness_amount, self)
                 end
             },
