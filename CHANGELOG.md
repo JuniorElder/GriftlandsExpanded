@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## Verison 0.31
+
+Day 2 boss for Rook added
+
+Slight changes to Incendiary Ammunition and Advanced Targeting
+
+Guided Shot and Thick-skinned removed completely
+
 ## Verison 0.3
 
 12 new negotiation cards for Sal

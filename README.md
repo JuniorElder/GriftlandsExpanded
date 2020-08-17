@@ -10,7 +10,7 @@ Mod for Griftlands that expands the game by adding new cards and bosses. In the 
 
 3 new bosses for Sal's story
 
-1 new boss for Rook's story
+2 new boss for Rook's story
 
 Item rewards for killing new bosses
 

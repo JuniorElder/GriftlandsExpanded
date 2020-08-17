@@ -23,9 +23,11 @@ local function OnLoad()
         "sal_boss_3_mod",
 
         "rook_boss_1_mod",
+        "rook_boss_2_bog_mod",
         -- QUESTS, CONVOS
-        "convo_override",
-        "convo_override_workaround"
+        "convo_override_1",
+        "convo_override_2",
+        "convo_override_3",
     }
     for k, filepath in ipairs(LOAD_FILE_ORDER) do
         require(self_dir .. filepath)
