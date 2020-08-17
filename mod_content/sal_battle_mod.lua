@@ -255,7 +255,7 @@ parry =
 {
     name = "Parry",
     icon = "battle/rebound.tex", 
-    desc = "Gain {1} {PERFECT_PARRY}.",
+    desc = "Gain {1} {COMBO} for each blocked attack until the start of your next turn.",
     desc_fn = function(self, fmt_str)
         return loc.format(fmt_str, self.parry_amount)
     end,

@@ -147,6 +147,52 @@ lumin_burner =
     end
 },
 
+ethereal_pheromones =
+{
+    name = "Ethereal Pheromones",
+    anim = "taunt",
+    desc = "Summon 1 random Burr to the appropriate team.",
+    icon = "battle/salve.tex",
+
+    cost = 0,
+
+    rarity = CARD_RARITY.UNIQUE,
+    flags = CARD_FLAGS.SKILL | CARD_FLAGS.EXPEND,
+    target_type = TARGET_TYPE.SELF,
+
+    OnPostResolve = function( self, battle, attack )
+        if battle:GetTeam(TEAM.BLUE):IsFull() and not battle:GetTeam(TEAM.RED):IsFull() then
+        local options = {"GROUT_SPARK_MINE", "GROUT_LOOT_CLUSTER", "GROUT_BOG_CYST"}
+        local summoned_burr = options[math.random(#options)]
+        local team = battle:GetTeam(TEAM.RED)
+        team:AddFighter( Fighter.CreateFromAgent( Agent(summoned_burr) ) )
+        team:ActivateNewFighters()
+        else if not battle:GetTeam(TEAM.BLUE):IsFull() and battle:GetTeam(TEAM.RED):IsFull() then
+        local options = {"GROUT_KNUCKLE"}
+        local summoned_burr = options[math.random(#options)]
+        local team = battle:GetTeam(TEAM.BLUE)
+        team:AddFighter( Fighter.CreateFromAgent( Agent(summoned_burr) ) )
+        team:ActivateNewFighters()
+        else if not battle:GetTeam(TEAM.BLUE):IsFull() and not battle:GetTeam(TEAM.RED):IsFull() then
+        local options = {"GROUT_KNUCKLE", "GROUT_SPARK_MINE", "GROUT_LOOT_CLUSTER", "GROUT_BOG_CYST"}
+        local summoned_burr = options[math.random(#options)]
+            if summoned_burr == "GROUT_KNUCKLE" then
+                local team = battle:GetTeam(TEAM.BLUE)
+                team:AddFighter( Fighter.CreateFromAgent( Agent(summoned_burr ) ) )
+                team:ActivateNewFighters()
+            else
+                local team = battle:GetTeam(TEAM.RED)
+                team:AddFighter( Fighter.CreateFromAgent( Agent(summoned_burr ) ) )
+                team:ActivateNewFighters()
+            end
+        else
+
+        end
+        end
+        end
+    end
+},
+
 }
 
 for i, id, data in sorted_pairs(attacks) do

@@ -57,38 +57,6 @@ local CARDS =
 
         dominance_stacks = 2,
     },
-    thick_skinned = 
-    {
-        name = "Thick-skinned",
-        icon = "negotiation/brainstorm.tex",
-        desc = "Gain {1} {THICK_SKINNED}.",
-        desc_fn = function( self, fmt_str )
-            return loc.format(fmt_str, self.thick_skinned_stacks)
-        end,
-
-        cost = 2,
-
-        flags = CARD_FLAGS.MANIPULATE | CARD_FLAGS.EXPEND,
-        rarity = CARD_RARITY.RARE,
-
-        thick_skinned_stacks = 1,
-
-        OnPostResolve = function( self, minigame, targets )
-            self.negotiator:AddModifier("THICK_SKINNED", self.thick_skinned_stacks)
-        end,
-    },
-    thick_skinned_plus = 
-    {
-        name = "Boosted Thick-skinned",
-
-        thick_skinned_stacks = 2,
-    },
-    thick_skinned_plus2 =
-    {
-        name = "Pale Thick-skinned",
-
-        cost = 1,
-    },
 
     questioning =
     {

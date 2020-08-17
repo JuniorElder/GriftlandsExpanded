@@ -167,53 +167,11 @@ local attacks =
         flags = CARD_FLAGS.SKILL | CARD_FLAGS.EXPEND | CARD_FLAGS.AMBUSH,
     },
 
-    guided_shot =
-    {
-        name = "Guided Shot",
-        icon = "battle/focused_assault.tex", 
-        pre_anim = "blast_pre",
-        anim = "blast",
-        post_anim = "blast_pst",
-        desc = "Attack twice. Has {PIERCING} if you have any {SURGE}",
-
-        cost = 1,
-
-        flags = CARD_FLAGS.RANGED,
-        rarity= CARD_RARITY.COMMON,
-
-        min_damage = 2,
-        max_damage = 3,
-        hit_count = 2,
-
-        PreReq = function( self, battle )
-            if self.owner:HasCondition("SURGE") then
-                self.flags = CARD_FLAGS.PIERCING | CARD_FLAGS.RANGED
-                return true
-            else
-                self.flags = CARD_FLAGS.RANGED
-                return false
-            end
-        end,
-    },
-    guided_shot_plus =
-    {
-        name = "Boosted Guided Shot",
-
-        min_damage = 3,
-        max_damage = 4,
-    },
-    guided_shot_plus2 =
-    {
-        name = "Tall Guided Shot",
-        min_damage = 1,
-        max_damage = 6,
-    },
-
     incendiary_ammunition =
     {
         name = "Incendiary Ammunition",
         icon = "battle/improvise_spare_ammo.tex", 
-        desc = "Apply {BURN 1} whenever you attack for the rest of the turn.",
+        desc = "{EXPEND} 1 chosen card in your hand.\nYour attacks apply {BURN 2} for the rest of the turn.",
         anim = "reload_01",
 
         target_type = TARGET_TYPE.SELF,
@@ -221,18 +179,21 @@ local attacks =
 
         cost = 0,
         max_xp = 5,
+        min_choose = 1,
+        max_choose = 1,
 
         flags = CARD_FLAGS.SKILL | CARD_FLAGS.EXPEND,
 
         condition =
         {
             icon = "battle/conditions/kashio_pistol.tex", 
+            desc = "Your attacks apply {BURN 2} for the rest of the turn.",
 
             event_handlers =
             {
                 [ BATTLE_EVENT.ON_HIT ] = function( self, battle, attack, hit )
                     if attack.attacker == self.owner and attack.card:IsAttackCard() and not hit.evaded then
-                        hit.target:AddCondition( "BURN", 1 )
+                        hit.target:AddCondition( "BURN", 2 )
                     end
                 end,
 
@@ -243,6 +204,8 @@ local attacks =
         },
 
         OnPostResolve = function( self, battle, attack)
+            local cards = battle:ExpendCards( self.min_choose, self.max_choose )
+
             self.owner:AddCondition( "incendiary_ammunition", 1, self)
         end,
     },
@@ -255,8 +218,37 @@ local attacks =
     incendiary_ammunition_plus2 =
     {
         name = "Spare Incendiary Ammunition",
+        desc = "{EXPEND} 2 chosen card in your hand.\nYour attacks apply {BURN 3} for the rest of the turn.",
 
-        flags = CARD_FLAGS.SKILL | CARD_FLAGS.EXPEND | CARD_FLAGS.REPLENISH,
+        min_choose = 2,
+        max_choose = 2,
+
+        flags = CARD_FLAGS.SKILL | CARD_FLAGS.EXPEND,
+
+        condition =
+        {
+            icon = "battle/conditions/kashio_pistol.tex", 
+            desc = "Your attacks apply {BURN 3} for the rest of the turn.",
+
+            event_handlers =
+            {
+                [ BATTLE_EVENT.ON_HIT ] = function( self, battle, attack, hit )
+                    if attack.attacker == self.owner and attack.card:IsAttackCard() and not hit.evaded then
+                        hit.target:AddCondition( "BURN", 3 )
+                    end
+                end,
+
+                [ BATTLE_EVENT.END_PLAYER_TURN ] = function( self, battle )
+                    self.owner:RemoveCondition( "incendiary_ammunition_plus2" )
+                end,
+            }
+        },
+
+        OnPostResolve = function( self, battle, attack)
+            local cards = battle:ExpendCards( self.min_choose, self.max_choose )
+
+            self.owner:AddCondition( "incendiary_ammunition_plus2", 1, self)
+        end,
     },
 
     psychic_overload = 
@@ -314,7 +306,7 @@ local attacks =
     advanced_targeting =
     {
         name = "Advanced Targeting",
-        desc = "Spend all {CHARGE}, apply 1 {RICOCHET} per {CHARGE} spent to a random enemy.",
+        desc = "Spend all {CHARGE}, apply 1 {RICOCHET}, than 1 {MARK} per {CHARGE} spent to a random enemy.",
         icon = "battle/riptide.tex", 
         anim = "mark",
 
@@ -334,6 +326,7 @@ local attacks =
                     battle:CollectRandomTargets( target_fighters, self.owner:GetEnemyTeam().fighters, 1 )
                     if target_fighters[ math.random( #target_fighters ) ] then --UGH
                         target_fighters[ math.random( #target_fighters ) ]:AddCondition("RICOCHET", 1, self)
+                        target_fighters[ math.random( #target_fighters ) ]:AddCondition("MARK", 1, self)
                     end
                 end
                 tracker:RemoveCharges(tracker:GetCharges(), self)
@@ -344,7 +337,7 @@ local attacks =
     advanced_targeting_plus =
     {
         name = "Boosted Targeting",
-        desc = "Spend all {CHARGE}, apply 2 {RICOCHET} per {CHARGE} spent to a random enemy.",
+        desc = "Spend all {CHARGE}, apply 2 {RICOCHET}, than 1 {MARK} per {CHARGE} spent to a random enemy.",
 
         OnPostResolve = function( self, battle, attack )
             local tracker = self.owner:GetCondition("lumin_tracker")
@@ -354,6 +347,7 @@ local attacks =
                     battle:CollectRandomTargets( target_fighters, self.owner:GetEnemyTeam().fighters, 1 )
                     if target_fighters[ math.random( #target_fighters ) ] then --UGH
                         target_fighters[ math.random( #target_fighters ) ]:AddCondition("RICOCHET", 2, self)
+                        target_fighters[ math.random( #target_fighters ) ]:AddCondition("MARK", 1, self)
                     end
                 end
                 tracker:RemoveCharges(tracker:GetCharges(), self)
@@ -363,18 +357,18 @@ local attacks =
 
     advanced_targeting_plus2 =
     {
-        name = "Inductive Targeting",
-        desc = "Gain 2 {CHARGE} then spend all {CHARGE}, apply 1 {RICOCHET} per {CHARGE} spent to a random enemy.",
+        name = "Pointed Targeting",
+        desc = "Spend all {CHARGE}, apply 1 {RICOCHET}, than 2 {MARK} per {CHARGE} spent to a random enemy.",
 
         OnPostResolve = function( self, battle, attack )
             local tracker = self.owner:GetCondition("lumin_tracker")
-            if tracker then tracker:AddLuminCharges(2, self) end
             local target_fighters = {}
             if tracker and tracker:GetCharges() > 0 then
                 for i = 1, tracker:GetCharges() do
                     battle:CollectRandomTargets( target_fighters, self.owner:GetEnemyTeam().fighters, 1 )
                     if target_fighters[ math.random( #target_fighters ) ] then --UGH
                         target_fighters[ math.random( #target_fighters ) ]:AddCondition("RICOCHET", 1, self)
+                        target_fighters[ math.random( #target_fighters ) ]:AddCondition("MARK", 2, self)
                     end
                 end
                 tracker:RemoveCharges(tracker:GetCharges(), self)
