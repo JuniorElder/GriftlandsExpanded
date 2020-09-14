@@ -185,6 +185,51 @@ local CONDITIONS =
         },
     },
 
+    PLAYER_MALFUNCTIONING_CHARGE_CELLS =
+    {
+        name = "Malfunctioning Charge Cells",
+        icon = "battle/conditions/malfunctioning_charge_cells.tex",
+        desc = "At the end of your turn, take {1} damage per {CHARGE}. At the end of your turn, remove one <b>Malfunctioning Charge Cells</>.",
+        desc_fn = function( self, fmt_str )
+            return loc.format(fmt_str, self.damage)
+        end,
+
+        ctype = CTYPE.DEBUFF,
+
+        damage = 2,
+
+        target_type = TARGET_TYPE.FRIENDLY_OR_SELF,
+
+        CalculatePreviewDamage = function( self )
+            local tracker  = self.owner:GetCondition("lumin_tracker")
+            if tracker then
+                return self.damage * tracker:GetCharges()
+            else
+                return 0
+            end
+        end,
+
+        PreviewFn = function( self, damage_preview, targets )
+            local damage = self:CalculatePreviewDamage()
+            if targets[self.owner] == nil then
+               targets[self.owner] = {} 
+            end
+            table.insert(targets[self.owner], { condition = self, min_damage = damage, max_damage = damage, owner = self.owner })
+        end,
+
+        event_handlers = 
+        {
+            [ BATTLE_EVENT.END_TURN ] = function( self, fighter )
+                if self.owner == fighter then
+                local tracker = self.owner:GetCondition("lumin_tracker")
+                if tracker and tracker:GetCharges() > 0 then
+                    self.owner:ApplyDamage(tracker:GetCharges() * self.damage, nil, nil, nil, {"lumin"})
+                end
+                self.owner:RemoveCondition(self.id, 1, self)
+            end
+        end
+        },
+    }
 }
 
 for id, def in pairs( CONDITIONS ) do
