@@ -6,13 +6,13 @@ Mod for Griftlands that expands the game by adding new cards and bosses. In the 
 
 19 battle and 8 negotiation cards for Sal
 
-8 battle and 4 negotiation cards for Rook
+13 battle and 8 negotiation cards for Rook
 
 3 new bosses for Sal's story
 
 2 new boss for Rook's story
 
-Item rewards for killing new bosses
+Item rewards for killing the new bosses
 
 Generous amount of typos and inconsistent formatting
 

@@ -1,7 +1,7 @@
-MountModData( "JuniorElderExpandedMod" )
+MountModData( "GriftlandsExpanded-master" )
 
 local function OnLoad()
-    local self_dir = "JuniorElderExpandedMod:mod_content/"
+    local self_dir = "GriftlandsExpanded-master:mod_content/"
     local LOAD_FILE_ORDER =
     {
         -- COMPLEMENTARY CARDS AND DEFINITIONS
@@ -35,5 +35,9 @@ local function OnLoad()
 end
 
 return {
-    OnLoad = OnLoad
+    alias = "GriftlandsExpanded",
+    OnLoad = OnLoad,
+    title = "Griftlands Expanded",
+    previewImagePath = "Crone.png",
+    description_file = "GriftlandsExpanded:README.md",
 }
