@@ -20,7 +20,7 @@ return function(convo)
                 end
             end
 
-            local boss_def = TheGame:GetGameProfile():GetNoStreakRandom("SAL_DAY_1_BOSS_PICK", {"DRONE_GOON", "SPARK_BARON_BOSS", "GUARDIAN_AUTOMECH"}, 2)
+            local boss_def = TheGame:GetGameProfile():GetNoStreakRandom("SAL_DAY_1_BOSS_PICK", {"DRONE_GOON", "SPARK_BARON_BOSS", "GUARDIAN_AUTOMECH", "RISE_TURNCOAT_BOSS"}, 2)
             local goons = {cxt.quest:CreateSkinnedAgent( boss_def )}
 
             cxt.quest:AssignCastMember("kashio_goon", goons[1])
