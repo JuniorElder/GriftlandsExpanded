@@ -39,6 +39,6 @@ return {
     alias = "GriftlandsExpanded",  --path for files
     OnLoad = OnLoad,
     title = "Griftlands Expanded",
-    previewImagePath = "placeholder.png",
+    previewImagePath = "Griftlands Expanded.PNG",
     description_file = "GriftlandsExpanded:steam_description.txt",
 }
