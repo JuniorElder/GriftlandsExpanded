@@ -20,15 +20,15 @@ Generous amount of typos and inconsistent formatting
 
 Official guide [here](https://forums.kleientertainment.com/forums/topic/116914-early-mod-support/).
 
-0. Delete old version of the mod first
+0. Delete the old version of the mod first
 
-1. Go to "[user]/AppData/Roaming/Klei/Griftlands/" (it should contain save folder, log.txt and other game-generated files)
+1. Go to "[user]/AppData/Roaming/Klei/Griftlands/" (it should contain save folder, log.txt, and other game-generated files)
 2. Open the folder consisting of alphanumeric characters (it looks something like this: "72619hh2dd464m811a1b0e3a6ed")
 3. Create a new folder called "mods"
 4. Unzip "GriftlandsExpanded-master" folder into "mods" folder
-5. Start a new run and have fun
+5. Open the game and enable the mod in mod manager
 
-If it doesn't work, put the "mods" folder directly into "[user]/AppData/Roaming/Klei/Griftlands/"
+If it doesn't work put the "mods" folder directly into "[user]/AppData/Roaming/Klei/Griftlands/"
 
 ## Compatibility
 

@@ -1,7 +1,7 @@
-MountModData( "GriftlandsExpanded-master" )
+MountModData( "GriftlandsExpanded" )
 
 local function OnLoad()
-    local self_dir = "GriftlandsExpanded-master:mod_content/"
+    local self_dir = "GriftlandsExpanded:mod_content/"
     local LOAD_FILE_ORDER =
     {
         -- COMPLEMENTARY CARDS AND DEFINITIONS
@@ -35,9 +35,10 @@ local function OnLoad()
 end
 
 return {
-    alias = "GriftlandsExpanded",
+    version = "0.4.1",
+    alias = "GriftlandsExpanded",  --path for files
     OnLoad = OnLoad,
     title = "Griftlands Expanded",
-    previewImagePath = "Crone.png",
-    description_file = "GriftlandsExpanded:README.md",
+    previewImagePath = "placeholder.png",
+    description_file = "GriftlandsExpanded:steam_description.txt",
 }
