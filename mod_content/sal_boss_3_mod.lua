@@ -31,7 +31,7 @@ local def = CharacterDef("DRUSK_ANCIENT",
     fight_data = 
     {
             MAX_MORALE = MAX_MORALE_LOOKUP.IMMUNE,
-            MAX_HEALTH = {200, 220, 240},
+            MAX_HEALTH = 220,
             battle_scale = 1.25,
             status_widget_dx = 0.5,
             status_widget_dy = -0.95,
@@ -43,7 +43,7 @@ local def = CharacterDef("DRUSK_ANCIENT",
                 name = "Phase I",
                 feature_desc = "Changes moveset after losing a significant portion of health.",
                 desc = "Changes moveset after losing a significant portion of health.",
-                icon = "JuniorElderExpandedMod:mod_content/icons/phase1.png",
+                icon = "GriftlandsExpanded:mod_content/icons/phase1.png",
 
             },
             phase2 =
@@ -51,7 +51,7 @@ local def = CharacterDef("DRUSK_ANCIENT",
                 name = "Phase II",
                 feature_desc = "Changes moveset after losing a significant portion of health.",
                 desc = "Changes moveset after losing a significant portion of health.",
-                icon = "JuniorElderExpandedMod:mod_content/icons/phase2.png",
+                icon = "GriftlandsExpanded:mod_content/icons/phase2.png",
                 ctype = CTYPE.DEBUFF,
 
                 apply_fx = {"power"},
