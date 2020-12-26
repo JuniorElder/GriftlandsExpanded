@@ -1,6 +1,26 @@
 # CHANGELOG
 
-## Verison 0.4
+## Verison 0.4.1
+
+1 new battle card for Sal
+
+2 new negotiation cards for Sal
+
+7 new battle cards for Rook
+
+2 new negotiation cards for Rook
+
+2 battle and 2 negotiation grafts for Sal
+
+2 battle and 2 negotiation grafts for Rook
+
+--
+
+Fixed bosses not appearing in the story
+
+Minor description fixes
+
+## Verison 0.4.0
 
 6 new battle cards for Rook
 

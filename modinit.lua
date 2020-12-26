@@ -15,8 +15,12 @@ local function OnLoad()
         -- ROOK CARDS
         "rook_negotiation_mod",
         "rook_battle_mod",
-        --"sal_battle_grafts_mod",
-        --"sal_negotiation_grafts_mod",
+        -- SAL GRAFTS
+        "sal_battle_grafts_mod",
+        "sal_negotiation_grafts_mod",
+        -- ROOK GRAFTS
+        "rook_battle_grafts_mod",
+        "rook_negotiation_grafts_mod",
         -- CUSTOM BOSSES
         "sal_boss_1_mod",
         "sal_boss_2_mod",
