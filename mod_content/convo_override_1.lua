@@ -26,7 +26,7 @@ local filepath = require "util/filepath"
 -- Each file under there must have the same name as the id of the convo that will be modified
 -- Each file returns a function that has 1 parameter: the convo object associated with the id.
 -- Example: See SAL_STORY_FSSHCAKES.lua
-local CONVO_DIR = "JuniorElderExpandedMod:mod_content/convo_override_1"
+local CONVO_DIR = "GriftlandsExpanded:mod_content/convo_override_1"
 
 ----------------------------------------------------------------------------------------
 -- Additional methods for the convo class. This is useful for modifying existing states.

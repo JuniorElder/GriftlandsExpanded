@@ -40,7 +40,7 @@ local attacks =
         flags = CARD_FLAGS.SKILL | CARD_FLAGS.EXPEND,
         target_type = TARGET_TYPE.SELF,
 
-	cost = 0,
+	    cost = 0,
 
         OnPostResolve = function( self, battle, attack )
             self.owner:AddCondition("EVASION", 1)
@@ -298,7 +298,7 @@ adrenaline_rush =
 {
     name = "Adrenaline Rush",
     icon = "battle/jolt.tex", 
-    desc = "{FINISHER}: Draw a card per {COMBO}.",
+    desc = "Spend all your {COMBO}: Draw a card per {COMBO}.",
     anim = "wildlunge",
     flags = CARD_FLAGS.MELEE | CARD_FLAGS.COMBO_FINISHER,
     rarity = CARD_RARITY.UNCOMMON, 
@@ -932,7 +932,7 @@ dancing_blade_plus2 =
     max_damage = 6,
 },
 
-resourceful =
+resourceful_modded =
 {
     name = "Resourceful",
     icon = "battle/scrounge.tex",
@@ -946,7 +946,7 @@ resourceful =
     target_type = TARGET_TYPE.SELF,
 
     OnPostResolve = function( self, battle, attack)
-        self.owner:AddCondition("resourceful", 1, self)
+        self.owner:AddCondition("resourceful_modded", 1, self)
     end,
 
     condition =
@@ -988,20 +988,20 @@ resourceful =
             end,
 
             [ BATTLE_EVENT.END_PLAYER_TURN ] = function( self, battle )
-                self.owner:RemoveCondition("resourceful", self.stacks, self)
+                self.owner:RemoveCondition("resourceful_modded", self.stacks, self)
             end,
         },
     },
 
 },
 
-resourceful_plus =
+resourceful_modded_plus =
 {
     name = "Targeted Resourceful",
     desc = "Until the end of the turn, whenever you gain or spend combo, {IMPROVISE_PLUS} a card from your deck.",
 
     OnPostResolve = function( self, battle, attack)
-        self.owner:AddCondition("resourceful_plus", 1, self)
+        self.owner:AddCondition("resourceful_modded_plus", 1, self)
     end,
 
     condition =
@@ -1043,13 +1043,13 @@ resourceful_plus =
             end,
 
             [ BATTLE_EVENT.END_PLAYER_TURN ] = function( self, battle )
-                self.owner:RemoveCondition("resourceful_plus", self.stacks, self)
+                self.owner:RemoveCondition("resourceful_modded_plus", self.stacks, self)
             end,
         },
     },
 },
 
-resourceful_plus2 =
+resourceful_modded_plus2 =
 {
     name = "Pale Resourceful",
     cost = 0,
@@ -1215,6 +1215,68 @@ whirlwind_plus2 =
 {
     name = "Enhanced Whirlwind",
     combo_gained = 6,
+},
+
+disguise =
+{
+    name = "Disguise",
+    desc = "Gain {1} {DEFEND}.\nIf you have at least 8 cards in hand, this card costs 0.",
+    desc_fn = function( self, fmt_str )
+        return loc.format( fmt_str, self.defend_amount)
+    end,
+    icon = "battle/gumption.tex",
+    anim = "taunt",
+
+    cost = 2,
+    
+    rarity = CARD_RARITY.UNCOMMON,
+    flags = CARD_FLAGS.SKILL,
+    target_type = TARGET_TYPE.SELF,
+
+    deck_handlers = { DECK_TYPE.DRAW, DECK_TYPE.DISCARDS },
+
+    defend_amount = 6,
+
+    OnPostResolve = function( self, battle, attack )
+        attack:AddCondition( "DEFEND", self.defend_amount, self )
+    end,
+
+    event_handlers =
+    {
+        [ BATTLE_EVENT.CALC_ACTION_COST ] = function( self, cost_acc, card, target )
+            if card == self and self.engine:GetHandDeck():CountCards() > 7 then
+                cost_acc:ModifyValue(0)
+            end
+        end
+    },
+
+},
+disguise_plus =
+{
+    name = "Boosted Disguise",
+
+    defend_amount = 8,
+
+    OnPostResolve = function( self, battle, attack )
+        attack:AddCondition( "DEFEND", self.defend_amount, self )
+    end,
+},
+
+disguise_plus2 =
+{
+    name = "Spined Disguise",
+    desc = "Gain {1} {DEFEND} and {2} {RIPOSTE}.\nIf you have at least 8 cards in hand, this card costs 0.",
+    desc_fn = function( self, fmt_str )
+        return loc.format( fmt_str, self.defend_amount, self.riposte_amount)
+    end,
+
+    defend_amount = 6,
+    riposte_amount = 2,
+
+    OnPostResolve = function( self, battle, attack )
+        attack:AddCondition( "DEFEND", self.defend_amount, self )
+        attack:AddCondition( "RIPOSTE", self.riposte_amount, self )
+    end,
 },
 
 }

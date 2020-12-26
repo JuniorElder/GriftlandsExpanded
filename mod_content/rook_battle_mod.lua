@@ -834,6 +834,502 @@ local attacks =
         },
     }, 
 
+    return_the_favour = 
+    {
+        name = "Return the Favour",
+        icon = "battle/bottle_smash.tex", 
+        anim = "whip",
+        desc = "Deal damage equal to your missing health.",
+
+        cost = 2,
+        max_xp = 3,
+
+        min_damage = 0,
+        max_damage = 0,
+
+        rarity = CARD_RARITY.RARE,
+        flags = CARD_FLAGS.MELEE | CARD_FLAGS.EXPEND,
+
+        event_handlers =
+        {
+            [ BATTLE_EVENT.CALC_DAMAGE ] = function( self, card, target, dmgt )
+                if card == self then
+                    local bonus = math.floor(self.owner:GetMaxHealth() - self.owner:GetHealth())
+                    dmgt:AddDamage( bonus, bonus, self )
+                end
+            end,
+        },
+    },
+
+    return_the_favour_plus =
+    {
+        name = "Nailed Return the Favour",
+
+        flags = CARD_FLAGS.MELEE | CARD_FLAGS.EXPEND | CARD_FLAGS.PIERCING,
+    },
+
+    return_the_favour_plus2 = 
+    {
+        name = "Enduring Return the Favour",
+
+        flags = CARD_FLAGS.MELEE
+    },
+    
+    at_all_costs =
+    {
+        name = "At All Costs",
+        icon = "battle/raw_power.tex", 
+		desc = "Gain {POWER {1}}.\n{ABILITY}: Take 1 damage after you play a card.",
+        desc_fn = function( self, fmt_str )
+            return loc.format( fmt_str, self.power )
+        end,
+        anim = "taunt",
+
+        rarity = CARD_RARITY.UNCOMMON,
+        flags =  CARD_FLAGS.SKILL | CARD_FLAGS.EXPEND,
+        target_type = TARGET_TYPE.SELF,
+        mod_xp = -3,
+
+        cost = 0,
+        power = 2,
+        self_damage = 1,
+
+        OnPostResolve = function(self, battle, attack)
+            self.owner:AddCondition("POWER", self.power, self)
+            local con = self.owner:AddCondition("at_all_costs", self.self_damage, self)
+            con.source_card = self
+        end,
+        
+        condition = 
+        {
+            ctype = CTYPE.DEBUFF,
+            icon = "battle/conditions/bloodbath.tex", 
+            name = "At All Costs",
+            desc = "Take {1} damage after you play a card.",
+            desc_fn = function(self, fmt_str)
+                return loc.format(fmt_str, self.stacks)
+            end,
+
+            event_handlers =
+            {    
+                [ BATTLE_EVENT.POST_RESOLVE ] = function( self, battle, attack )
+                    if attack and attack.card ~= self.source_card and attack.attacker == self.owner then
+                        self.owner:ApplyDamage(self.stacks, self.owner, self)
+                    end
+                end,
+            }
+        },
+    },
+    at_all_costs_plus = 
+    {
+        name = "Guarded At All Costs",
+        desc = "Gain {POWER {1}}.\n{ABILITY}: Take 1 damage after you play an attack.",
+
+        OnPostResolve = function(self, battle, attack)
+            self.owner:AddCondition("POWER", self.power, self)
+            local con = self.owner:AddCondition("at_all_costs_plus", self.self_damage, self)
+            con.source_card = self
+        end,
+
+        condition = 
+        {
+            ctype = CTYPE.DEBUFF,
+            name = "At All Costs",
+            icon = "battle/conditions/first_blood.tex", 
+            desc = "Take {1} damage after you play an attack.",
+            desc_fn = function(self, fmt_str)
+                return loc.format(fmt_str, self.stacks)
+            end,
+
+            event_handlers = 
+            {
+                [ BATTLE_EVENT.POST_RESOLVE ] = function( self, battle, attack )
+                    if attack and attack.card ~= self.source_card and attack.attacker == self.owner and attack.card:IsAttackCard() then
+                        self.owner:ApplyDamage(self.stacks, self.owner, self)
+                    end
+                end,
+            },
+        },
+    },
+    at_all_costs_plus2 =
+    {
+        name = "Boosted At All Costs",
+        power = 3,
+    },
+
+    ace = 
+    {
+        name = "Ace",
+        desc = "Chose a card in your hand and expend the rest. It costs 0 for the rest of the combat.",
+        icon = "negotiation/final_favor.tex", 
+        
+        flags = CARD_FLAGS.SKILL | CARD_FLAGS.EXPEND,
+        rarity = CARD_RARITY.RARE,
+        target_type = TARGET_TYPE.SELF,
+
+        cost = 2,
+
+        OnPostResolve = function( self, battle, attack )
+            while true do
+                local cards = {}
+                local discount = battle:ChooseCard()
+                local discounted_cards = {}
+                for i, card in battle:GetHandDeck():Cards() do
+                    if card ~= discount then
+                        table.insert( cards, card )
+                    end
+                    if card == discount then
+                        table.insert( discounted_cards, card )
+                    end
+                end
+                if #cards > 0 then
+                    for i, card in ipairs( cards ) do
+                        battle:ExpendCard( card )
+                    end
+                end
+
+                local con = self.owner:GetCondition("ace") or self.owner:AddCondition("ace", 1, self)
+                if con then 
+                    con.cards = con.cards or {}
+                    for i,card in ipairs(discounted_cards) do
+                        table.insert(con.cards, card)
+                    end
+                end
+                break
+            end
+        end,
+
+        condition =
+        {
+            hidden = true,
+
+            event_handlers = 
+            {
+                [ BATTLE_EVENT.CALC_ACTION_COST ] = function( self, acc, card, target )
+                    if self.cards and table.contains(self.cards, card) then
+                        acc:ModifyValue(0)
+                    end
+                end,
+            },
+        },
+    },
+
+    ace_plus = 
+    {
+        name = "Resiliant Ace",
+        desc = "Chose a card in your hand and expend the rest. It costs 0 for the rest of the combat. Then gain {1} {DEFEND}.",
+        desc_fn = function( self, fmt_str )
+            return loc.format(fmt_str, self.defense)
+        end,
+
+        cost = 2,
+        defense = 5,
+
+        OnPostResolve = function( self, battle, attack )
+            while true do
+                local cards = {}
+                local discount = battle:ChooseCard()
+                local discounted_cards = {}
+                for i, card in battle:GetHandDeck():Cards() do
+                    if card ~= discount then
+                        table.insert( cards, card )
+                    end
+                    if card == discount then
+                        table.insert( discounted_cards, card )
+                    end
+                end
+                if #cards > 0 then
+                    for i, card in ipairs( cards ) do
+                        battle:ExpendCard( card )
+                    end
+                end
+
+                local con = self.owner:GetCondition("ace") or self.owner:AddCondition("ace", 1, self)
+                if con then 
+                    con.cards = con.cards or {}
+                    for i,card in ipairs(discounted_cards) do
+                        table.insert(con.cards, card)
+                    end
+                end
+                self.owner:AddCondition("DEFEND", self.defense, self)
+                break
+            end
+        end,
+    },
+    ace_plus2 =
+    {
+        name = "Resourceful Ace",
+        desc = "Chose a card in your hand and expend the rest. It costs 0 for the rest of the combat. Then draw {1}.",
+        desc_fn = function( self, fmt_str )
+            return loc.format(fmt_str, self.num_cards)
+        end,
+
+        num_cards = 2,
+
+        OnPostResolve = function( self, battle, attack )
+            while true do
+                local cards = {}
+                local discount = battle:ChooseCard()
+                local discounted_cards = {}
+                for i, card in battle:GetHandDeck():Cards() do
+                    if card ~= discount then
+                        table.insert( cards, card )
+                    end
+                    if card == discount then
+                        table.insert( discounted_cards, card )
+                    end
+                end
+                if #cards > 0 then
+                    for i, card in ipairs( cards ) do
+                        battle:ExpendCard( card )
+                    end
+                end
+
+                local con = self.owner:GetCondition("ace") or self.owner:AddCondition("ace", 1, self)
+                if con then 
+                    con.cards = con.cards or {}
+                    for i,card in ipairs(discounted_cards) do
+                        table.insert(con.cards, card)
+                    end
+                end
+                battle:DrawCards( self.num_cards )
+                break
+            end
+        end,
+    },
+    
+    crackdown = 
+    {
+        name = "Crackdown",
+        desc = "All enemies lose 1 {POWER} for each attack in your hand until the start of your next turn.",
+        icon = "negotiation/flash_badge.tex", 
+        anim = "mark",
+
+        flags = CARD_FLAGS.SKILL,
+        rarity = CARD_RARITY.UNCOMMON,
+        target_mod = TARGET_MOD.TEAM,
+
+        cost = 1,
+
+        OnPostResolve = function( self, battle, attack )
+            local supressed = 0
+            for i, card in battle:GetHandDeck():Cards() do
+                if card:IsAttackCard() then
+                    supressed = supressed + 1
+                end
+            end
+            attack:AddCondition("crackdown", supressed, self)
+        end,
+
+        condition =
+        {
+            ctype = CTYPE.DEBUFF,
+            name = "Suppressed",
+            desc = "Attack damage is deacresed by {1}. Remove all {crackdown} at the end of your turn.",
+            desc_fn = function( self, fmt_str )
+                return loc.format(fmt_str, self.stacks)
+            end,
+            icon = "battle/conditions/sucker_punch.tex", 
+
+            event_handlers = 
+            {
+                [ BATTLE_EVENT.CALC_DAMAGE ] = function( self, card, target, dmgt )
+                    if card.owner == self.owner then
+                    if card.owner == self.owner and card:IsAttackCard() and not card.ignore_power then
+                        dmgt:ModifyDamage( dmgt.min_damage - self.stacks, dmgt.max_damage - self.stacks, self )
+                    end
+                    end
+                end,
+
+                [ BATTLE_EVENT.END_TURN ] = function( self, fighter )
+                    if fighter == self.owner then
+                        self.owner:RemoveCondition( self.id, self.stacks )
+                    end
+                end,
+            },
+        },
+    },
+
+    crackdown_plus = 
+    {
+        name = "Resourceful Crackdown",
+        desc = "Draw 1, then all enemies lose 1 {POWER} for each attack in your hand until the start of your next turn.",
+
+        OnPostResolve = function( self, battle, attack )
+            battle:DrawCards( 1 )
+
+            local supressed = 0
+            for i, card in battle:GetHandDeck():Cards() do
+                if card:IsAttackCard() then
+                    supressed = supressed + 1
+                end
+            end
+            attack:AddCondition("crackdown", supressed, self)
+        end,
+    },
+    crackdown_plus2 =
+    {
+        name = "Targeted Crackdown",
+
+        flags = CARD_FLAGS.SKILL | CARD_FLAGS.EXPEND | CARD_FLAGS.STICKY,
+    },
+    
+    bark = 
+    {
+        name = "Bark",
+        anim = "taunt",
+        icon = "battle/protective_procedure.tex", 
+        desc = "Gain {1} {DEFEND}.",
+        desc_fn = function( self, fmt_str )
+            return loc.format(fmt_str, self.defense_amt)
+        end,
+
+        max_xp = 5,
+        cost = 1,
+
+        flags = CARD_FLAGS.SKILL | CARD_FLAGS.HATCH,
+        rarity = CARD_RARITY.UNCOMMON,
+        target_type = TARGET_TYPE.SELF,
+
+        defense_amt = 12,
+
+        OnPostResolve = function( self, battle, attack )
+            self.owner:AddCondition("DEFEND", self.defense_amt, self)
+        end,
+
+        hatch = true,
+        hatch_fn = function( self, battle )
+            self:TransferCard( battle.trash_deck )
+            self:Consume()
+            local card = TheGame:GetGameState():GetPlayerAgent().battler:LearnCard("twig")
+            local battle_card = card:Clone()
+            battle_card.owner = self.owner
+            battle:DealCard( battle_card, battle:GetHandDeck( ) )
+        end,
+    },
+    
+    overwhelming_experience =
+    {
+        name = "Overwhelming Experience",
+        desc = "{ABILITY}: At the end of your turn gain 1 {DEFEND} for each card left in your hand.",
+        icon = "negotiation/tactical_mind.tex", 
+
+        cost = 2,
+        max_xp = 3,
+
+        flags = CARD_FLAGS.SKILL | CARD_FLAGS.EXPEND,
+        rarity = CARD_RARITY.RARE,
+        target_type = TARGET_TYPE.SELF,
+
+        OnPostResolve = function( self, battle, attack )
+            self.owner:AddCondition("overwhelming_experience", 1, self)
+        end,
+
+        condition =
+        {
+            name = "Overwhelming Experience",
+            desc = "At the end of your turn gain {1} {DEFEND} for each card left in your hand.",
+            desc_fn = function( self, fmt_str )
+                return loc.format(fmt_str, self.stacks)
+            end,
+            icon = "battle/conditions/lumin_daze.tex", 
+
+            event_handlers =
+            {
+                [ BATTLE_EVENT.END_PLAYER_TURN ] = function( self, battle )
+                    self.owner:AddCondition("DEFEND", battle:GetHandDeck():CountCards() * self.stacks)
+                end
+            }
+        },
+    },
+
+    overwhelming_experience_plus =
+    {
+        name = "Extensive Experience",
+        desc = "Draw 3. {ABILITY}: At the end of your turn gain 1 {DEFEND} for each card left in your hand.",
+
+        OnPostResolve = function( self, battle, attack )
+            battle:DrawCards(3)
+            self.owner:AddCondition("overwhelming_experience", 1, self)
+        end,
+    },
+
+    overwhelming_experience_plus2 =
+    {
+        name = "Initial Experience",
+        flags = CARD_FLAGS.SKILL | CARD_FLAGS.EXPEND | CARD_FLAGS.AMBUSH,
+    },
+    
+    shady_business =
+    {
+        name = "Shady Business",
+        icon = "negotiation/deceive.tex", 
+        desc = "{ABILITY}: At the start of your turn spend 1 {CHARGE} and draw 1 additional card.",
+
+        cost = 1,
+
+        flags = CARD_FLAGS.SKILL | CARD_FLAGS.EXPEND,
+        rarity = CARD_RARITY.UNCOMMON,
+        target_type = TARGET_TYPE.SELF,
+
+        OnPostResolve = function( self, battle, attack )
+            self.owner:AddCondition("shady_business", 1, self)
+        end,
+
+        condition =
+        {
+            name = "Shady Business",
+            desc = "At the start of your turn spend up to {1} {CHARGE} and draw {1} additional card for {CHARGE} spent.",
+            desc_fn = function( self, fmt_str )
+                return loc.format(fmt_str, self.stacks)
+            end,
+            icon = "battle/conditions/shadow_mastery.tex", 
+
+            event_handlers =
+            {
+
+            [ BATTLE_EVENT.BEGIN_PLAYER_TURN ] = function( self, battle )
+                local tracker = self.owner:GetCondition("lumin_tracker")
+                local count = tracker:GetCharges()
+                if tracker and count > 0 then
+                    if count > (self.stacks - 1) then
+                    tracker:RemoveCharges(self.stacks)
+                    battle:DrawCards(self.stacks)
+                    else
+                    tracker:RemoveCharges(count)
+                    battle:DrawCards(count)
+                    end
+                end
+            end
+            }
+        },
+    },
+
+    shady_business_plus =
+    {
+        name = "Energized Shady Business",
+        desc = "Gain {1} {CHARGE}. {ABILITY}: At the start of your turn spend 1 {CHARGE} and draw 1 additional card.",
+        desc_fn = function( self, fmt_str )
+            return loc.format(fmt_str, self.charge_amt)
+        end,
+
+        charge_amt = 2,
+
+        OnPostResolve = function( self, battle, attack )
+            self.owner:AddCondition("shady_business", 1, self)
+            local tracker = self.owner:GetCondition("lumin_tracker")
+            if tracker then
+                tracker:AddLuminCharges(self.charge_amt, self)
+            end
+        end,
+    },
+
+    shady_business_plus2 =
+    {
+        name = "Initial Shady Business",
+        flags = CARD_FLAGS.SKILL | CARD_FLAGS.EXPEND | CARD_FLAGS.AMBUSH,
+    },
+
 }
 
 for i, id, data in sorted_pairs(attacks) do

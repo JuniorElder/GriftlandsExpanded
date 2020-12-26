@@ -37,6 +37,34 @@ local CARDS =
     },
 }
 
+local MODIFIERS = {
+    
+    GUILT = 
+    {
+        name = "Guilt",
+        desc = "Your core argument takes {1} damage whenever your opponent plays a Diplomacy card.",
+        desc_fn = function( self, fmt_str )
+            return loc.format(fmt_str, self.stacks)
+        end,
+        icon = "negotiation/modifiers/nervous.tex",
+
+        OnInit = function( self, source )
+            self.source = source
+        end,
+
+        modifier_type = MODIFIER_TYPE.INCEPTION,
+
+        event_handlers =
+        {
+            [ EVENT.POST_RESOLVE ] = function( self, minigame, card )
+                if card:IsFlagged( CARD_FLAGS.DIPLOMACY ) and card ~= self.source then
+                    self.negotiator:AttackResolve(self.stacks, self)
+                end
+            end,
+        },
+    },        
+}
+
 for i, id, carddef in sorted_pairs( CARDS ) do
     carddef.rarity = carddef.rarity or CARD_RARITY.BASIC
     carddef.series = CARD_SERIES.GENERAL
@@ -44,3 +72,7 @@ for i, id, carddef in sorted_pairs( CARDS ) do
     Content.AddNegotiationCard( id, carddef )
 end
 
+
+for id, def in pairs( MODIFIERS ) do
+    Content.AddNegotiationModifier( id, def )
+end

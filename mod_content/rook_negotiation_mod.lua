@@ -423,7 +423,7 @@ local CARDS =
 
     swindle_modded_plus =
     {
-        name = "Repeated Swindle",
+        name = "Repeating Swindle",
         desc = "Set the coin twice.\n{EVOKE}: {RIG} {HEADS} or {SNAILS}.",
         OnPostResolve = function( self, minigame, targets )
             local coin = self.negotiator:FindModifier("LUCKY_COIN")
@@ -499,6 +499,113 @@ local CARDS =
         composure_gained = 4,
     },
     
+    visions = 
+    {
+        name = "Visions",
+        icon = "negotiation/amplify.tex",
+        desc = "Target argument loses {1} resolve. You gain {1} resolve.",
+        desc_fn = function( self, fmt_str )
+            return loc.format(fmt_str, self.resolve_amt)
+        end,
+
+        max_xp = 5,
+        cost = 1,
+
+        flags = CARD_FLAGS.MANIPULATE | CARD_FLAGS.HATCH,
+        rarity = CARD_RARITY.UNCOMMON,
+
+        target_self = TARGET_FLAG.ARGUMENT | TARGET_FLAG.BOUNTY,
+        target_enemy = TARGET_FLAG.ARGUMENT | TARGET_FLAG.BOUNTY | TARGET_FLAG.CORE,
+        
+        resolve_amt = 5,
+
+        CanPlayCard = function( self, card, engine, target )
+            if card == self and target then
+                if target:GetResolve() == nil then
+                    return false, CARD_PLAY_REASONS.NO_TARGET_RESOLVE
+                end
+            end
+            return true
+        end,
+
+        OnPostResolve = function( self, minigame, targets )
+            for i, target in ipairs( targets ) do
+                local resolve = target:GetResolve() or 0
+                resolve = math.min( self.resolve_amt, resolve )
+                target:ModifyResolve( -resolve, self )
+                self.negotiator:ModifyResolve( self.resolve_amt, self )
+            end
+        end,
+
+        hatch = true,
+        hatch_fn = function( self, minigame )
+            self:TransferCard( minigame.trash_deck )
+            self:Consume()
+            local card = TheGame:GetGameState():GetPlayerAgent().negotiator:LearnCard("stem")
+            local minigame_card = card:Clone()
+            minigame_card.owner = self.owner
+            minigame:DealCard( minigame_card, minigame:GetHandDeck( ) )
+        end,
+    },
+    
+    conspiracy =
+    {
+        name = "Conspiracy",
+        icon = "negotiation/ad_hominem.tex",
+        desc = "While this is in your hand, {GAMBLE} whenever you {PREPARE} a card.",
+
+        cost = 0,
+
+        flags = CARD_FLAGS.MANIPULATE | CARD_FLAGS.UNPLAYABLE,
+        rarity = CARD_RARITY.UNCOMMON,
+
+        event_handlers =
+        {
+            [ EVENT.CARDS_SWAPPED ] = function( self, source, card, idx )
+                self:AddXP(1)
+                local coin = self.negotiator:FindModifier("LUCKY_COIN")
+                if coin then
+                    coin:Gamble(self)
+                end
+            end,
+        },
+    },
+
+    conspiracy_plus =
+    {
+        name = "Repeating Conspiracy",
+        desc = "While this is in your hand, {GAMBLE} twice whenever you {PREPARE} a card.",
+
+        event_handlers =
+        {
+            [ EVENT.CARDS_SWAPPED ] = function( self, source, card, idx )
+                self:AddXP(1)
+                local coin = self.negotiator:FindModifier("LUCKY_COIN")
+                if coin then
+                    coin:Gamble(self)
+                    coin:Gamble(self)
+                end
+            end,
+        },
+    },
+    
+    conspiracy_plus2 =
+    {
+        name = "Targeted Conspiracy",
+        desc = "While this is in your hand, set the coin whenever you {PREPARE} a card.",
+
+        event_handlers =
+        {
+            [ EVENT.CARDS_SWAPPED ] = function( self, source, card, idx )
+                self:AddXP(1)
+                local coin = self.negotiator:FindModifier("LUCKY_COIN")
+                if coin then
+                    coin:SetCoin(nil, self)
+                end
+            end,
+        },
+    },
+
 }
 
 for i, id, carddef in sorted_pairs( CARDS ) do

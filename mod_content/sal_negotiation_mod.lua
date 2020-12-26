@@ -423,6 +423,149 @@ local CARDS =
         min_persuasion = 2,
         max_persuasion = 6,
     },
+    
+    puppy_eyes =
+    {
+        name = "Puppy Eyes",
+        icon =  "negotiation/fall_guy.tex",
+        desc = "{INCEPT} {GUILT {1}}. Gain {2} {COMPOSURE}.",
+        desc_fn = function( self, fmt_str )
+            return loc.format( fmt_str, self.stacks, self.composure )
+        end,
+
+        cost = 1,
+
+        flags = CARD_FLAGS.MANIPULATE,
+        rarity = CARD_RARITY.UNCOMMON,
+        stacks = 1,
+        composure = 2,
+
+        OnPostResolve = function( self, minigame, targets )
+            self.anti_negotiator:InceptModifier("GUILT", self.stacks, self )
+            self.negotiator:DeltaComposure( self.composure, self )
+        end,
+
+    },
+    puppy_eyes_plus = 
+    {
+        name = "Boosted Puppy Eyes",
+        stacks = 2,
+    },
+
+    puppy_eyes_plus2 = 
+    {
+        name = "Stone Puppy Eyes",
+        composure = 4,
+    },
+    
+    pull_the_strings =
+    {
+        name = "Pull the Strings",
+        icon =  "negotiation/networked.tex",
+        desc = "Insert {improvise_boast} or {improvise_conviction} into your hand.",
+        cost = 1,
+
+        flags = CARD_FLAGS.MANIPULATE,
+        rarity = CARD_RARITY.UNCOMMON,
+
+        pool_size = 2,
+
+        pool_cards = {"improvise_boast", "improvise_conviction"},
+
+        OnPostResolve = function( self, minigame, targets)
+            local cards = ObtainWorkTable()
+
+            cards = table.multipick( self.pool_cards, self.pool_size )
+            for k,id in pairs(cards) do
+                cards[k] = Negotiation.Card( id, self.owner  )
+            end
+            minigame:ImproviseCards( cards, 1 )
+            ReleaseWorkTable(cards)
+        end,
+    },
+
+    pull_the_strings_plus =
+    {
+        name = "Hurtful Strings",
+        desc = "Insert {improvise_boast}, {improvise_conviction} or {improvise_contempt} into your hand.",
+        pool_cards = {"improvise_boast", "improvise_conviction", "improvise_contempt"},
+
+        pool_size = 3,
+    },
+
+    pull_the_strings_plus2 = 
+    {
+        name = "Empathic Strings",
+        desc = "Insert {improvise_boast}, {improvise_conviction} or {improvise_sympathy} into your hand.",
+        pool_cards = {"improvise_boast", "improvise_conviction", "improvise_sympathy"},
+
+        pool_size = 3,
+    },
+
+
+    improvise_conviction = 
+    {
+        name = "Conviction",
+        icon =  "negotiation/overdrive.tex",
+        desc = "{INCEPT} 1 {DOUBT}.",
+
+        cost = 0,
+
+        flags = CARD_FLAGS.MANIPULATE | CARD_FLAGS.EXPEND,
+        rarity = CARD_RARITY.UNIQUE,
+
+        OnPostResolve = function( self, minigame, targets )
+            self.anti_negotiator:InceptModifier("DOUBT", 1 , self )
+        end
+    },
+
+    improvise_sympathy = 
+    {
+        name = "Sympathy",
+        icon =  "negotiation/cachet.tex",
+        desc = "{INCEPT} 1 {GUILT}.",
+
+        cost = 0,
+
+        flags = CARD_FLAGS.MANIPULATE | CARD_FLAGS.EXPEND,
+        rarity = CARD_RARITY.UNIQUE,
+
+        OnPostResolve = function( self, minigame, targets )
+            self.anti_negotiator:InceptModifier("GUILT", 1 , self )
+        end
+    },
+
+    improvise_boast =
+    {
+        name = "Oblivious",
+        icon =  "negotiation/disregard.tex",
+        desc = "{INCEPT} 1 {FLUSTERED}.",
+
+        cost = 0,
+
+        flags = CARD_FLAGS.HOSTILE | CARD_FLAGS.EXPEND,
+        rarity = CARD_RARITY.UNIQUE,
+
+        OnPostResolve = function( self, minigame, targets )
+            self.anti_negotiator:InceptModifier("FLUSTERED", 1 , self )
+        end
+    },
+
+    improvise_contempt =
+    {
+        name = "Contempt",
+        icon =  "negotiation/degrade.tex",
+        desc = "{INCEPT} 1 {VULNERABILITY}.",
+
+        cost = 0,
+
+        flags = CARD_FLAGS.HOSTILE | CARD_FLAGS.EXPEND,
+        rarity = CARD_RARITY.UNIQUE,
+
+        OnPostResolve = function( self, minigame, targets )
+            self.anti_negotiator:InceptModifier("VULNERABILITY", 1 , self )
+        end
+    },
 }
 
 for i, id, carddef in sorted_pairs( CARDS ) do
