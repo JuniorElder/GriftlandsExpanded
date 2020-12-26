@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## Verison 0.4.1
+## Verison 0.4.2
 
 1 new battle card for Sal
 
@@ -20,7 +20,9 @@ Fixed bosses not appearing in the story
 
 Minor description fixes
 
-## Verison 0.4.0
+## Verison 0.4.1
+
+Released on Steam
 
 6 new battle cards for Rook
 
