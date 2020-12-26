@@ -12,8 +12,9 @@ return function(convo)
                 cxt.enc:GetScreen():SetBlur(false)
                 cxt:Dialog("DIALOG_INTRO")
                 
-                local boss_def = TheGame:GetGameProfile():GetNoStreakRandom("SAL_DAY_2_BOSS_PICK", {"JAKES_ASSASSIN", "JAKES_ASSASSIN2", "JAKES_GHOST"}, 2)
-                local assassin = cxt.quest:CreateSkinnedAgent( boss_def )
+                cxt.quest.param.boss_id = TheGame:GetGameProfile():GetNoStreakRandom("SAL_DAY_2_BOSS_PICK", {"JAKES_ASSASSIN", "JAKES_ASSASSIN2", "JAKES_GHOST"}, 2)
+
+                local assassin = cxt.quest:CreateSkinnedAgent( cxt.quest.param.boss_id )
 
                 TheGame:GetGameState():AddAgent( assassin )
                 assassin:MoveToLocation(cxt.location)
@@ -67,7 +68,7 @@ return function(convo)
                                     end
 
                                 end,
-                                on_win = function(cxt) 
+                                on_win = function(cxt)
                                     cxt:GoTo(cxt:GetAgent():IsDead() and "STATE_POST_FIGHT_DEAD" or "STATE_POST_FIGHT_ALIVE")
                                 end,
                             }

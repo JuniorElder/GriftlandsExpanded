@@ -192,7 +192,7 @@ return function(convo)
         :ClearFn()
         :Fn(function(cxt) 
             
-            local boss_def_alternative = TheGame:GetGameProfile():GetNoStreakRandom("ROOK_DAY_1_BOSS_PICK", {"HESH_BOSS", "RENTORIAN_BOSS", "ADMIRALTY_OPERATIVE"}, 2)
+            local boss_def_alternative = TheGame:GetGameProfile():GetNoStreakRandom("ROOK_DAY_1_BOSS_PICK", {"HESH_BOSS", "RENTORIAN_BOSS", "ADMIRALTY_OPERATIVE", "mercenary_boss"}, 2)
             cxt.quest.param[boss_def_alternative] = true
             
             if cxt.quest.param.HESH_BOSS == true then cxt.quest.param.HESH_BOSS_alternative = true end
