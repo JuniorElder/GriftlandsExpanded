@@ -1,5 +1,17 @@
 # CHANGELOG
 
+## Verison 0.4.3
+
+New card for Sal: If it Bleeds
+
+Experience changes: Paranoia, Resource Management, Whirlwind, Dancing Blade, Ace, Shady Bussiness, Crackdown, Feed the Fire, Resourceful, Mayhem
+
+Gameplay changes: Spot Weakness, Parry (Outmaneuver), Proper Technique (Escape Artist), Marked Shot, Mayhem
+
+Upgrade changes: Adrenaline Rush, Mindfulness
+
+Icon, description, animation changes: Parry (Outmaneuver), Proper Technique (Escape Artist)
+
 ## Verison 0.4.2
 
 1 new battle card for Sal
