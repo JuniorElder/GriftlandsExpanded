@@ -39,7 +39,7 @@ local function OnLoad()
 end
 
 return {
-    version = "0.4.2",
+    version = "0.4.3",
     alias = "GriftlandsExpanded",  --path for files
     OnLoad = OnLoad,
     title = "Griftlands Expanded",
