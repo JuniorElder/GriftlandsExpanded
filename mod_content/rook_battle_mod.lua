@@ -25,7 +25,7 @@ local attacks =
         name = "Mayhem",
         icon = "battle/wildfire.tex",
         anim = "burner",
-        desc = "Hits all enemies. Remove all {CONCENTRATION} stacks. Gain {1} {EXPOSED}.",
+        desc = "Hits all enemies. Remove all your {CONCENTRATION} stacks. Gain {1} {EXPOSED}.",
         desc_fn = function( self, fmt_str )
             return loc.format(fmt_str, self.exposion_amount)
         end,
@@ -40,18 +40,22 @@ local attacks =
         max_damage = 10,
         target_mod = TARGET_MOD.TEAM,
 
-        exposion_amount = 2,
+        exposion_amount = 1,
 
         OnPostResolve = function( self, battle, attack )
-            self.owner:AddCondition("CONCENTRATION", -self.owner:GetConditionStacks("CONCENTRATION"), self)
+            self.owner:AddCondition("CONCENTRATION", math.floor(self.owner:GetConditionStacks("CONCENTRATION")/-1), self)
             self.owner:AddCondition("EXPOSED", self.exposion_amount, self)
         end
     },
     mayhem_plus =
     {
         name = "Professional Mayhem",
-        
-        exposion_amount = 1,
+        desc = "Hits all enemies. Remove half of your {CONCENTRATION} stacks. Gain {1} {EXPOSED}.",
+
+        OnPostResolve = function( self, battle, attack )
+            self.owner:AddCondition("CONCENTRATION", math.floor(self.owner:GetConditionStacks("CONCENTRATION")/-2), self)
+            self.owner:AddCondition("EXPOSED", self.exposion_amount, self)
+        end
     },
     mayhem_plus2 = 
     {
@@ -126,10 +130,10 @@ local attacks =
         icon = "battle/inside_fighting.tex",
         anim = "psionic",
 
-        max_xp = 4,
-        cost = 2,
+        max_xp = 5,
+        cost = 1,
         flags = CARD_FLAGS.SKILL | CARD_FLAGS.EXPEND,
-        rarity = CARD_RARITY.RARE,
+        rarity = CARD_RARITY.UNCOMMON,
         target_type = TARGET_TYPE.SELF,
 
         OnPostResolve = function( self, battle, attack )
@@ -139,6 +143,7 @@ local attacks =
         condition = 
         {
             icon = "battle/conditions/mark.tex",
+            name = "Spot Weakness",
             desc = "Whenever you apply a debuff to an enemy, gain {1} {CONCENTRATION}.",
             desc_fn = function( self, fmt_str )
                 return loc.format(fmt_str, self.stacks)
@@ -155,9 +160,14 @@ local attacks =
     },
     spot_weakness_plus =
     {
-        name = "Pale Spot Weakness",
-        
-        cost = 1,
+        name = "Boosted Spot Weakness",
+        desc = "{ABILITY}: Whenever you apply a debuff to an enemy, gain 2 {CONCENTRATION}.",
+
+        cost = 2,
+
+        OnPostResolve = function( self, battle, attack )
+            self.owner:AddCondition("spot_weakness", 2, self)
+        end,
     },
 
     spot_weakness_plus2 =
@@ -382,7 +392,7 @@ local attacks =
         pre_anim = "double_pre",
         anim = "double",
         post_anim = "double_pst",
-        desc = "Attack twice.\nDeals +{1} damage for every {MARK} on the target.",
+        desc = "Attack twice.\nDeals +{1} max damage for every {MARK} on the target.",
         desc_fn = function( self, fmt_str )
             return loc.format(fmt_str, self.bonus_damage)
         end,
@@ -406,7 +416,7 @@ local attacks =
                 if card == self and target then
                     local count = 0
                     count = target:GetConditionStacks("MARK")
-                    dmgt:AddDamage(count * self.bonus_damage, count * self.bonus_damage, self)
+                    dmgt:AddDamage( 0, count * self.bonus_damage, self )
                 end
             end
         },
@@ -479,6 +489,7 @@ local attacks =
         end,
 
         cost = 1,
+        max_xp = 7,
 
         flags = CARD_FLAGS.MELEE,
         rarity = CARD_RARITY.UNCOMMON,
@@ -968,6 +979,7 @@ local attacks =
         target_type = TARGET_TYPE.SELF,
 
         cost = 2,
+        max_xp = 3,
 
         OnPostResolve = function( self, battle, attack )
             while true do
@@ -1110,6 +1122,7 @@ local attacks =
         target_mod = TARGET_MOD.TEAM,
 
         cost = 1,
+        max_xp = 7,
 
         OnPostResolve = function( self, battle, attack )
             local supressed = 0
@@ -1267,6 +1280,7 @@ local attacks =
         desc = "{ABILITY}: At the start of your turn spend 1 {CHARGE} and draw 1 additional card.",
 
         cost = 1,
+        max_xp = 5,
 
         flags = CARD_FLAGS.SKILL | CARD_FLAGS.EXPEND,
         rarity = CARD_RARITY.UNCOMMON,

@@ -6,129 +6,193 @@ local attacks =
 {	
 	proper_technique =
     {
-        name = "Proper Technique",
-        anim = "taunt",
-        desc = "Insert {float_butterfly} or {sting_bee} into your hand.",
-	    icon = "negotiation/sals_instincts.tex",
+        name = "Escape Artist",
+        desc = "Insert {hamstring} or {graceful_retreat} into your hand.",
+	    icon = "battle/get_down.tex",
 
         rarity = CARD_RARITY.RARE,
-        flags = CARD_FLAGS.SKILL | CARD_FLAGS.EXPEND,
+	    flags = CARD_FLAGS.SKILL | CARD_FLAGS.EXPEND | CARD_FLAGS.STICKY,
         target_type = TARGET_TYPE.SELF,
 
         cost = 2,
         max_xp = 4,
 
-        sound = "event:/sfx/battle/status/special/sals_daggers",
-
         OnPostResolve = function( self, battle, attack)
             local cards = {
-                Battle.Card( "float_butterfly", self.owner ),
-                Battle.Card( "sting_bee", self.owner ),
+                Battle.Card( "hamstring", self.owner ),
+                Battle.Card( "graceful_retreat", self.owner ),
             }
             battle:ImproviseCards( cards )
         end,
     },
  
-    float_butterfly = 
-    {
-        name = "Float Like a Butterfly",
-        desc = "Gain 1 {EVASION}.",
-        anim = "taunt",
-	    icon = "battle/slippery.tex",
-
-        rarity = CARD_RARITY.UNIQUE,
-        flags = CARD_FLAGS.SKILL | CARD_FLAGS.EXPEND,
-        target_type = TARGET_TYPE.SELF,
-
-	    cost = 0,
-
-        OnPostResolve = function( self, battle, attack )
-            self.owner:AddCondition("EVASION", 1)
-        end,
-	
-	features = 
-        {
-            DEFEND = 6,
-        }
-    },
-
-    sting_bee = 
-    {
-        name = "Sting Like a Bee!",
-        anim = "stab",
-	    icon = "battle/echo_strike.tex",
-
-        rarity = CARD_RARITY.UNIQUE,
-        flags = CARD_FLAGS.MELEE | CARD_FLAGS.EXPEND,
-        cost = 0,
-
-        min_damage = 4,
-        max_damage = 4,
-
-        features =
-        {
-            STUN = 1,
-        }
-    },
-
     proper_technique_plus =
     {
-        name = "Conservative Technique",
-	    flags = CARD_FLAGS.SKILL | CARD_FLAGS.EXPEND | CARD_FLAGS.STICKY,
-    },
-        proper_technique_plus2 =
-    {
-        name = "Innovative Technique",
-        desc = "Insert {float_butterfly} or {sting_bee} into your hand.\nDraw two cards.",
+        name = "Radical Escape Artist",
+        desc = "Insert {hamstring}, {graceful_retreat} or {anaesthesia} into your hand.",
 
-        OnPostResolve = function( self, battle, attack )
-            battle:DrawCards(2)
+        OnPostResolve = function( self, battle, attack)
             local cards = {
-                Battle.Card( "float_butterfly", self.owner ),
-                Battle.Card( "sting_bee", self.owner ),
+                Battle.Card( "hamstring", self.owner ),
+                Battle.Card( "graceful_retreat", self.owner ),
+                Battle.Card( "anaesthesia", self.owner ),
             }
             battle:ImproviseCards( cards )
         end,
     },
+
+    proper_technique_plus2 =
+    {
+        name = "Geared Escape Artist",
+        desc = "Insert {hamstring}, {graceful_retreat} or {flashbang} into your hand.",
+
+        OnPostResolve = function( self, battle, attack )
+            local cards = {
+                Battle.Card( "hamstring", self.owner ),
+                Battle.Card( "graceful_retreat", self.owner ),
+                Battle.Card( "flashbang", self.owner ),
+            }
+            battle:ImproviseCards( cards )
+        end,
+    },
+
+    flashbang = 
+    {
+        name = "Flashbang",
+        desc = "{STUN} everyone except yourself.",
+        anim = "throw",
+        hit_tags = { "spark" },
+        icon = "battle/gunsmoke.tex",
+        
+        rarity = CARD_RARITY.UNIQUE,
+        flags = CARD_FLAGS.SKILL | CARD_FLAGS.EXPEND,
+        cost = 0,
+
+        target_type = TARGET_TYPE.ANY,
+        target_mod = TARGET_MOD.CUSTOM,
+        auto_target = true,
+
+        target_fn = function( self, battle, primary_target, target_fighters )
+            for i, fighter in battle:ActiveFighters() do
+                if fighter:GetStatus() ~= FIGHT_STATUS.SURRENDER then
+                    table.insert( target_fighters, fighter )
+                end
+            end
+        end,
+
+        OnPostResolve = function( self, battle, attack )
+            for i, hit in attack:Hits() do
+                hit.target:AddCondition("STUN", 1, self)
+            end
+        end    
+    },
+
+    anaesthesia = 
+    {
+        name = "Anaesthesia",
+        desc = "Remove all debuffs and gain 8 {DEFEND}.",
+        anim = "drink",
+	    icon = "battle/power_through.tex",
+
+        rarity = CARD_RARITY.UNIQUE,
+        flags = CARD_FLAGS.SKILL | CARD_FLAGS.EXPEND,
+        cost = 0,
+
+        target_type = TARGET_TYPE.SELF,
+
+        defend_amt = 8,
+
+        OnPostResolve = function( self, battle, attack)
+            self.owner:RemoveAllDebuffs()
+            attack:AddCondition("DEFEND", self.defend_amt, self)
+        end,
+    },
+
+    graceful_retreat = 
+    {
+        name = "Graceful Retreat",
+        desc = "Gain 2 {EVASION} and 2 {RIPOSTE}.",
+        anim = "step_back",
+	    icon = "battle/misdirection.tex",
+
+        rarity = CARD_RARITY.UNIQUE,
+        flags = CARD_FLAGS.SKILL | CARD_FLAGS.EXPEND,
+        cost = 0,
+
+        target_type = TARGET_TYPE.SELF,
+
+        evasion_amt = 2,
+        riposte_amt = 2,
+
+        OnPostResolve = function( self, battle, attack)
+            attack:AddCondition("RIPOSTE", self.riposte_amt, self)
+            attack:AddCondition("EVASION", self.evasion_amt, self)
+        end,
+    },
     
+    hamstring = 
+    {
+        name = "Hamstring",
+        desc = "Apply 2 {IMPAIR} to all enemies and draw 2 cards. They cost 0 until played.",
+        anim = "taunt2",
+	    icon = "battle/certainty.tex",
+
+        rarity = CARD_RARITY.UNIQUE,
+        flags = CARD_FLAGS.SKILL | CARD_FLAGS.EXPEND,
+        cost = 0,
+
+        target_mod = TARGET_MOD.TEAM,
+
+        OnPostResolve = function( self, battle, attack )
+            local cards = battle:DrawCards( 2 )
+            for i = 1, math.min( #cards, 2 ) do
+                cards[i]:SetFlags( CARD_FLAGS.FREEBIE )
+            end
+            for i, hit in attack:Hits() do
+                hit.target:AddCondition("IMPAIR", 2, self)
+            end
+        end   
+    },
+
     energy_field =
     {
         name = "Energy Field",
+        desc = "Gain {DEFEND {1}}.\nGain {2} {RIPOSTE}.",
+        desc_fn = function(self, fmt_str)
+            return loc.format(fmt_str, self.defend_amt, self.riposte_amt )
+        end,
         icon = "battle/arc_deflection.tex",    
         anim = "taunt",
+
         target_type = TARGET_TYPE.SELF,
         rarity = CARD_RARITY.COMMON,
         cost = 2,
         max_xp = 8,
         flags = CARD_FLAGS.SKILL,
 
-	    features = 
-            {
-	        DEFEND = 8,
-            RIPOSTE = 2,
-            },
-        },
+        defend_amt = 8,
+        riposte_amt = 2,
+        
+        OnPostResolve = function( self, battle, attack)
+            attack:AddCondition("DEFEND", self.defend_amt, self)
+            attack:AddCondition("RIPOSTE", self.riposte_amt, self)
+        end,
+    },
     energy_field_plus =
     {
         name = "Portable Energy Field",	
-        desc = "Apply {DEFEND 6}.\nApply 4 {RIPOSTE}.",        
-        manual_desc = true,
         target_type = TARGET_TYPE.FRIENDLY_OR_SELF,
+        desc = "Apply {DEFEND {1}}.\nApply {2} {RIPOSTE}.",
 
-        features = 
-        {
-        DEFEND = 6,
-        RIPOSTE = 4,
-        },
+        defend_amt = 6,
+        riposte_amt = 4,
     },
     energy_field_plus2 =
     {
         name = "Charged Energy Field",
-        features = 
-        {
-	        DEFEND = 12,
-            RIPOSTE = 2,
-        },
+
+        defend_amt = 12,
+        riposte_amt = 2,
     },
     recollection = 
     {
@@ -251,48 +315,47 @@ local attacks =
         max_damage = 9,
     },
 
-parry =
-{
-    name = "Parry",
-    icon = "battle/rebound.tex", 
-    desc = "Gain {1} {COMBO} for each blocked attack until the start of your next turn.",
+    parry =
+    {
+    name = "Outmaneuver",
+    icon = "battle/weakness_slow.tex", 
+    desc = "Gain {1} {DEFEND}.\nSpend {2} {COMBO} to increase {DEFEND} applied by {3} for the rest of this combat.",
     desc_fn = function(self, fmt_str)
-        return loc.format(fmt_str, self.parry_amount)
+        return loc.format(fmt_str, self.defense_amt, self.combo_needed, self.defense_increase)
     end,
     anim = "taunt",
     target_type = TARGET_TYPE.SELF,
-    rarity = CARD_RARITY.COMMON,
+    rarity = CARD_RARITY.UNCOMMON,
     cost = 1,
     max_xp = 7,
-    flags = CARD_FLAGS.SKILL,
+    flags = CARD_FLAGS.SKILL | CARD_FLAGS.COMBO_FINISHER,
 
-    parry_amount = 1,
+    defense_amt = 4,
+    combo_needed = 3,
+    defense_increase = 2,
 
-    features = 
-        {
-            DEFEND = 4,
-        },
-
-        OnPostResolve = function( self, battle, attack)
-            self.owner:AddCondition("PERFECT_PARRY", self.parry_amount, self)
-        end,
+    OnPostResolve = function( self, battle, attack )
+        self.owner:AddCondition("DEFEND", self.defense_amt)
+        if self.owner:GetConditionStacks("COMBO") > (self.combo_needed - 1) then
+            self.defense_amt = self.defense_amt + self.defense_increase
+            self.owner:RemoveCondition("COMBO", self.defense_increase)
+        end
+    end,
     },  
-parry_plus =
-{
-    name = "Stone Parry",
 
-    features = 
+    parry_plus =
     {
-        DEFEND = 6,
+    name = "Stone Outmaneuver",
+
+    defense_amt = 6,
     },
-},
-parry_plus2 =
-{
-    name = "Rival's Parry",
 
-    parry_amount = 2,
+    parry_plus2 =
+    {
+    name = "Pale Outmaneuver",
 
-},
+    combo_needed = 2,
+    },
 
 adrenaline_rush = 
 {
@@ -308,7 +371,7 @@ adrenaline_rush =
     max_damage = 4,
     cards_drawn = 1,
 
-    OnPreResolve = function( self, battle, attack )
+    OnPostResolve = function( self, battle, attack )
         if self.owner:HasCondition("COMBO") then
             battle:DrawCards( self.cards_drawn * self.owner:GetConditionStacks("COMBO") )
             self.owner:RemoveCondition("COMBO")
@@ -318,18 +381,34 @@ adrenaline_rush =
 
 adrenaline_rush_plus =
 {
-    name = "Pale Adrenaline Rush",
+    name = "Ambitious Adrenaline Rush",
+    desc = "Discard your hand.\nSpend all your {COMBO}: Draw a card per {COMBO}.",
 
-    cost = 0,
-    min_damage = 1,
-    max_damage = 2,
+    OnPostResolve = function( self, battle, attack)
+
+        local tbl = ObtainWorkTable()
+        for i, card in battle:GetHandDeck():Cards() do
+            table.insert(tbl, card)
+        end
+
+        for i, card in ipairs(tbl) do
+            battle:DiscardCard(card)
+        end
+
+        ReleaseWorkTable(tbl)
+
+        if self.owner:HasCondition("COMBO") then
+            battle:DrawCards( self.cards_drawn * self.owner:GetConditionStacks("COMBO") )
+            self.owner:RemoveCondition("COMBO")
+        end
+    end,
 },
 
 adrenaline_rush_plus2 = 
 {
     name = "Boosted Adrenaline Rush",
 
-    min_damage = 4,
+    min_damage = 3,
     max_damage = 6,
 },
 
@@ -340,6 +419,7 @@ resource_management =
     icon = "battle/fully_loaded.tex", 
 
     cost = 1,
+    max_xp = 6,
 
     flags = CARD_FLAGS.SKILL,
     rarity = CARD_RARITY.UNCOMMON,
@@ -810,10 +890,8 @@ mindfulness =
     condition =
     {
         icon = "battle/conditions/gear_head.tex",
-        name = "Mindfulness",
+        name = "Targeted Mindfulness",
         desc = "Whenever you {HEAL}, draw a card, then discard a card.",
-
-        apply_sound = "event:/sfx/battle/status/system/Status_Buff_Attack",
 
         event_handlers =
         {
@@ -838,8 +916,34 @@ mindfulness_plus =
 
 mindfulness_plus2 =
 {
-    name = "Pale Mindfulness",
-    cost = 0,
+    name = "Targeted Mindfulness",
+    desc = "{ABILITY}: Whenever you {HEAL}, {IMPROVISE} a card from your draw pile, then discard a card.",
+
+        OnPostResolve = function( self, battle, attack)
+            self.owner:AddCondition("mindfulness_plus2", 1, self)
+        end,
+    
+        condition =
+        {
+            icon = "battle/conditions/gear_head.tex",
+            name = "Mindfulness",
+            desc = "Whenever you {HEAL}, {IMPROVISE} a card from your draw pile, then discard a card.",
+    
+            event_handlers =
+            {
+                [ BATTLE_EVENT.DELTA_STAT ] = function( self, fighter, stat, delta, value, mitigated  )
+                    if fighter == self.owner and stat == COMBAT_STAT.HEALTH then
+                        if delta > 0 then
+                            if self.battle:GetDrawDeck():CountCards() == 0 then
+                                self.battle:ShuffleDiscardToDraw()
+                            end
+                            local cards = self.battle:ImproviseCards(table.multipick(self.battle:GetDrawDeck().cards, 3), 1)
+                            self.battle:DiscardCards(1)
+                        end
+                    end
+                end,
+            },
+        },
 },
 
 dancing_blade =
@@ -853,6 +957,7 @@ dancing_blade =
     end,
 
     cost = 1,
+    max_xp = 6,
 
     rarity = CARD_RARITY.RARE,
     flags = CARD_FLAGS.MELEE ,
@@ -940,6 +1045,8 @@ resourceful_modded =
     desc = "Until the end of the turn, whenever you gain or spend combo, {IMPROVISE} a card from your deck.",
 
     cost = 1,
+    max_xp = 4,
+    
     rarity = CARD_RARITY.UNCOMMON,
     flags = CARD_FLAGS.SKILL | CARD_FLAGS.EXPEND,
 
@@ -1186,6 +1293,7 @@ whirlwind =
     flags = CARD_FLAGS.MELEE,
 
     cost = 1,
+    max_xp = 7,
 
     min_damage = 2,
     max_damage = 4,
@@ -1279,6 +1387,56 @@ disguise_plus2 =
     end,
 },
 
+if_it_bleeds = 
+{
+    name = "If it Bleeds",
+    desc = "{ABILITY}: All your attacks deal max damage if the target has {BLEED}.",
+    cost = 2,
+    icon = "battle/sacrifice.tex",
+    anim = "taunt2",
+
+    flags = CARD_FLAGS.SKILL | CARD_FLAGS.EXPEND,
+    rarity = CARD_RARITY.UNCOMMON,
+    target_type = TARGET_TYPE.SELF,
+
+    OnPostResolve = function( self, battle, attack )
+        self.owner:AddCondition("if_it_bleeds", 1, self)
+    end,
+
+    condition = 
+    {
+        desc = "All your attacks deal max damage if the target has {BLEED}.",
+        icon = "battle/conditions/cleaved.tex",
+
+        event_priorities = 
+        {
+            [ BATTLE_EVENT.CALC_DAMAGE ] = EVENT_PRIORITY_MULTIPLIER,
+        },
+
+        event_handlers =
+        {
+            [ BATTLE_EVENT.CALC_DAMAGE ] = function( self, card, target, dmgt )
+                if card.owner == self.owner and target then
+                    if target:HasCondition("BLEED") then
+                        dmgt:AddDamage((dmgt.max_damage-dmgt.min_damage), 0, self)
+                    end
+                end
+            end
+        },
+    },
+},
+
+if_it_bleeds_plus =
+{
+    name = "Pale If it Bleeds",
+    cost = 1,
+},
+
+if_it_bleeds_plus2 = 
+{
+    name = "Initial If it Bleeds",
+    flags = CARD_FLAGS.SKILL | CARD_FLAGS.EXPEND | CARD_FLAGS.AMBUSH,
+},
 }
 
 for i, id, data in sorted_pairs(attacks) do

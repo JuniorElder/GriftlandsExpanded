@@ -350,7 +350,7 @@ local CARDS =
         rarity = CARD_RARITY.RARE,
         cost = 1,
 
-        mod_xp = -2,
+        mod_xp = -3,
 
         doubt_cost = 2,
 
